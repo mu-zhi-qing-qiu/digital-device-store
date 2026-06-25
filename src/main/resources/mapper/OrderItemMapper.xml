@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.store.mapper.OrderItemMapper">
+
+    <resultMap id="OrderItemVOMap" type="com.example.store.vo.OrderItemVO">
+        <id     property="id"            column="id"/>
+        <result property="orderId"       column="order_id"/>
+        <result property="productId"     column="product_id"/>
+        <result property="quantity"      column="quantity"/>
+        <result property="purchasePrice" column="purchase_price"/>
+        <result property="productName"   column="product_name"/>
+    </resultMap>
+
+    <select id="selectWithProductByOrderId" resultMap="OrderItemVOMap">
+        SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.purchase_price,
+               p.name AS product_name
+        FROM order_item oi
+        LEFT JOIN product p ON oi.product_id = p.id
+        WHERE oi.order_id = #{orderId}
+    </select>
+
+</mapper>

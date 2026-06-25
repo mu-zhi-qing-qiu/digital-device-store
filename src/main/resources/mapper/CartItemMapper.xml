@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.store.mapper.CartItemMapper">
+
+    <resultMap id="CartItemVOMap" type="com.example.store.vo.CartItemVO">
+        <id     property="id"          column="ci_id"/>
+        <result property="cartId"      column="cart_id"/>
+        <result property="productId"   column="product_id"/>
+        <result property="quantity"    column="quantity"/>
+        <result property="productName" column="product_name"/>
+        <result property="price"       column="price"/>
+        <result property="brand"       column="brand"/>
+        <result property="imageUrl"    column="image_url"/>
+    </resultMap>
+
+    <select id="selectWithProductByUserId" resultMap="CartItemVOMap">
+        SELECT ci.id AS ci_id, ci.cart_id, ci.product_id, ci.quantity,
+               p.name AS product_name, p.price, p.brand,
+               (SELECT url FROM product_image WHERE product_id = p.id LIMIT 1) AS image_url
+        FROM cart_item ci
+        JOIN cart c ON ci.cart_id = c.id
+        JOIN product p ON ci.product_id = p.id
+        WHERE c.user_id = #{userId}
+    </select>
+
+</mapper>

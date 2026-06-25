@@ -1,0 +1,22 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+*.iws
+*.ipr
+
+### Logs ###
+*.log
+
+### OS ###
+.DS_Store
+
+HELP.md
+
+### node_modules ###
+node_modules/
+
+### docx ###
+*.docx
