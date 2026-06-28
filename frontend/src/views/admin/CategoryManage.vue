@@ -1,45 +1,52 @@
 <template>
-  <div>
-    <el-button type="primary" @click="openDialog()" style="margin-bottom:16px">新增分类</el-button>
-    <el-table :data="list" border>
-      <el-table-column prop="id"       label="ID"   width="80" />
-      <el-table-column prop="name"     label="分类名" />
-      <el-table-column prop="parentId" label="父分类ID" width="120" />
-      <el-table-column label="操作" width="160">
-        <template #default="{ row }">
-          <el-button link type="primary" @click="openDialog(row)">编辑</el-button>
-          <el-button link type="danger"  @click="del(row.id)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+  <section class="admin-page">
+    <div class="head">
+      <div>
+        <p class="eyebrow">管理端 / 分类</p>
+        <h1>分类管理</h1>
+      </div>
+      <LuxuryButton @click="openDialog()">新增分类</LuxuryButton>
+    </div>
 
-    <el-dialog v-model="show" :title="form.id ? '编辑分类' : '新增分类'" width="400px">
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="分类名"><el-input v-model="form.name" /></el-form-item>
-        <el-form-item label="父分类">
-          <el-select v-model="form.parentId" placeholder="不选则为顶级" clearable>
-            <el-option v-for="c in list" :key="c.id" :label="c.name" :value="c.id" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="show=false">取消</el-button>
-        <el-button type="primary" @click="save">保存</el-button>
-      </template>
-    </el-dialog>
-  </div>
+    <div class="cards">
+      <article v-for="item in list" :key="item.id" class="panel card">
+        <span>分类 {{ item.id }}</span>
+        <h2>{{ item.name }}</h2>
+        <p>父级：{{ item.parentId || '根分类' }}</p>
+        <div>
+          <button type="button" @click="openDialog(item)">编辑</button>
+          <button type="button" @click="del(item.id)">删除</button>
+        </div>
+      </article>
+    </div>
+
+    <div v-if="show" class="modal">
+      <form class="dialog glass" @submit.prevent="save">
+        <h2>{{ form.id ? '编辑分类' : '新增分类' }}</h2>
+        <input v-model="form.name" class="lux-input" placeholder="分类名称" />
+        <input v-model="form.parentId" class="lux-input" placeholder="父级 ID，可为空" />
+        <div class="dialog__actions">
+          <LuxuryButton variant="ghost" @click="show = false">取消</LuxuryButton>
+          <LuxuryButton type="submit">保存</LuxuryButton>
+        </div>
+      </form>
+    </div>
+  </section>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { getCategories, addCategory, updateCategory, deleteCategory } from '@/api/category'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import LuxuryButton from '@/components/ui/LuxuryButton.vue'
 
 const list = ref([])
 const show = ref(false)
 const form = reactive({})
 
-async function load() { list.value = await getCategories() }
+async function load() {
+  list.value = await getCategories()
+}
 
 function openDialog(row = {}) {
   Object.assign(form, { id: null, name: '', parentId: null, ...row })
@@ -54,10 +61,90 @@ async function save() {
 }
 
 async function del(id) {
-  await ElMessageBox.confirm('确认删除？', '警告', { type: 'warning' })
+  await ElMessageBox.confirm('确认删除该分类？', '警告', { type: 'warning' })
   await deleteCategory(id)
   load()
 }
 
 onMounted(load)
 </script>
+
+<style scoped>
+.admin-page {
+  display: grid;
+  gap: 24px;
+}
+
+.head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+}
+
+h1 {
+  margin: 0;
+  font-size: 52px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.card {
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+}
+
+.card span,
+.card p {
+  margin: 0;
+  color: #777;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.card div,
+.dialog__actions {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+
+.modal {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.72);
+  padding: 24px;
+}
+
+.dialog {
+  display: grid;
+  width: min(100%, 480px);
+  gap: 14px;
+  border-radius: 28px;
+  padding: 28px;
+}
+
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

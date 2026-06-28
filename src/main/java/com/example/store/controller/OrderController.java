@@ -1,7 +1,9 @@
 package com.example.store.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.store.common.auth.AuthContext;
 import com.example.store.common.Result;
+import com.example.store.common.exception.BizException;
 import com.example.store.entity.Order;
 import com.example.store.entity.OrderItem;
 import com.example.store.service.OrderService;
@@ -22,21 +24,35 @@ public class OrderController {
     /** 提交订单 */
     @PostMapping
     public Result<Order> place(@RequestBody PlaceOrderRequest req) {
-        return Result.success(orderService.placeOrder(req.getUserId(), req.getItems()));
+        return Result.success(orderService.placeOrder(AuthContext.userId(), req.getItems()));
     }
 
     /** 分页查询用户订单 */
-    @GetMapping("/{userId}")
+    @GetMapping
     public Result<Page<Order>> list(
-            @PathVariable Long userId,
             @RequestParam(defaultValue = "1")  Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize) {
-        return Result.success(orderService.listByUser(userId, pageNum, pageSize));
+        return Result.success(orderService.listByUser(AuthContext.userId(), pageNum, pageSize));
+    }
+
+    /** 管理端分页查询全部订单 */
+    @GetMapping("/admin/page")
+    public Result<Page<Order>> page(
+            @RequestParam(defaultValue = "1")  Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        return Result.success(orderService.pageAll(pageNum, pageSize));
     }
 
     /** 查询订单明细（含商品名称） */
     @GetMapping("/{orderId}/items")
     public Result<List<OrderItemVO>> items(@PathVariable Long orderId) {
+        Order order = orderService.getById(orderId);
+        if (order == null) {
+            throw new BizException("订单不存在");
+        }
+        if (!AuthContext.isAdmin() && !order.getUserId().equals(AuthContext.userId())) {
+            throw new BizException(403, "无权查看其他用户订单");
+        }
         return Result.success(orderService.getOrderItems(orderId));
     }
 
@@ -49,7 +65,6 @@ public class OrderController {
 
     @Data
     public static class PlaceOrderRequest {
-        private Long userId;
         private List<OrderItem> items;
     }
 }

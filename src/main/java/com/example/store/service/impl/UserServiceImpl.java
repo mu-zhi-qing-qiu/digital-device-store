@@ -20,7 +20,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (lambdaQuery().eq(User::getUsername, user.getUsername()).exists()) {
             throw new BizException("用户名已存在");
         }
-        user.setRole(user.getRole() == null ? 0 : user.getRole());
+        user.setRole(0);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         save(user);
         user.setPassword(null);

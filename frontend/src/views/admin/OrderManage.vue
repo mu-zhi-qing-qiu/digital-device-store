@@ -1,43 +1,50 @@
 <template>
-  <div>
-    <el-table :data="list" border>
-      <el-table-column prop="id"          label="订单ID" width="100" />
-      <el-table-column prop="userId"      label="用户ID" width="100" />
-      <el-table-column prop="totalAmount" label="总金额"  width="120">
-        <template #default="{row}">¥{{ row.totalAmount }}</template>
-      </el-table-column>
-      <el-table-column prop="status" label="状态" width="120">
-        <template #default="{ row }">
-          <el-select :model-value="row.status" size="small" @change="v => changeStatus(row, v)">
-            <el-option v-for="(t,i) in statusText" :key="i" :label="t" :value="i" />
-          </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column prop="createdTime" label="下单时间" />
-    </el-table>
-    <el-pagination background layout="prev,pager,next" :total="total" :page-size="pageSize"
-      v-model:current-page="pageNum" @current-change="load" style="margin-top:12px" />
-  </div>
+  <section class="admin-page">
+    <div class="head">
+      <p class="eyebrow">管理端 / 订单</p>
+      <h1>订单管理</h1>
+    </div>
+
+    <div class="orders">
+      <article v-for="item in list" :key="item.id" class="order panel">
+        <div>
+          <span>订单 {{ item.id }}</span>
+          <h2>{{ money(item.totalAmount) }}</h2>
+          <p>{{ item.createdTime }}</p>
+        </div>
+        <select :value="item.status" class="lux-select" @change="changeStatus(item, Number($event.target.value))">
+          <option v-for="(label, index) in statusText" :key="label" :value="index">{{ label }}</option>
+        </select>
+      </article>
+    </div>
+
+    <el-pagination
+      v-if="total > pageSize"
+      v-model:current-page="pageNum"
+      :total="total"
+      :page-size="pageSize"
+      layout="prev, pager, next"
+      @current-change="load"
+    />
+  </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getOrders, updateStatus } from '@/api/order'
+import { getAdminOrders, updateStatus } from '@/api/order'
 import { ElMessage } from 'element-plus'
+import { money } from '@/utils/format'
 
-// 管理端查所有用户订单：这里传userId=0查全量，需后端配合；简化版先复用接口
-// 生产环境需单独添加 GET /api/order/all 管理员接口
-const list      = ref([])
-const total     = ref(0)
-const pageNum   = ref(1)
-const pageSize  = ref(10)
-const statusText = ['待付款','已付款','已发货','已完成','已取消']
+const list = ref([])
+const total = ref(0)
+const pageNum = ref(1)
+const pageSize = ref(10)
+const statusText = ['待付款', '已付款', '已发货', '已完成', '已取消']
 
 async function load() {
-  // TODO: 后端补全 /api/order/admin/all 接口后替换
-  // 暂时展示演示数据
-  list.value = []
-  total.value = 0
+  const page = await getAdminOrders(pageNum.value, pageSize.value)
+  list.value = page.records || []
+  total.value = page.total || 0
 }
 
 async function changeStatus(row, status) {
@@ -48,3 +55,45 @@ async function changeStatus(row, status) {
 
 onMounted(load)
 </script>
+
+<style scoped>
+.admin-page {
+  display: grid;
+  gap: 24px;
+}
+
+h1 {
+  margin: 8px 0 0;
+  font-size: 52px;
+}
+
+.orders {
+  display: grid;
+  gap: 16px;
+}
+
+.order {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+}
+
+.order span,
+.order p {
+  margin: 0;
+  color: #777;
+}
+
+.order h2 {
+  margin: 10px 0;
+  font-size: 40px;
+}
+
+@media (max-width: 760px) {
+  .order {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

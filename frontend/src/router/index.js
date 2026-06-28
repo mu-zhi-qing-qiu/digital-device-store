@@ -9,9 +9,13 @@ const routes = [
     component: () => import('@/views/Layout.vue'),
     children: [
       { path: '',              component: () => import('@/views/Home.vue') },
+      { path: 'products',      component: () => import('@/views/ProductList.vue') },
+      { path: 'search',        component: () => import('@/views/Search.vue') },
       { path: 'product/:id',  component: () => import('@/views/ProductDetail.vue') },
       { path: 'cart',         component: () => import('@/views/Cart.vue'),      meta: { auth: true } },
+      { path: 'checkout',     component: () => import('@/views/Checkout.vue'),  meta: { auth: true } },
       { path: 'orders',       component: () => import('@/views/OrderList.vue'), meta: { auth: true } },
+      { path: 'profile',      component: () => import('@/views/Profile.vue'),   meta: { auth: true } },
     ]
   },
   {
@@ -26,7 +30,7 @@ const routes = [
       { path: 'orders',   component: () => import('@/views/admin/OrderManage.vue') },
     ]
   },
-  { path: '/:pathMatch(.*)*', redirect: '/' }
+  { path: '/:pathMatch(.*)*', component: () => import('@/views/NotFound.vue') }
 ]
 
 const router = createRouter({

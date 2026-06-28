@@ -1,5 +1,6 @@
 package com.example.store.controller;
 
+import com.example.store.common.auth.AuthContext;
 import com.example.store.common.Result;
 import com.example.store.entity.Review;
 import com.example.store.service.ReviewService;
@@ -24,6 +25,7 @@ public class ReviewController {
     /** 提交评论 */
     @PostMapping
     public Result<Void> add(@RequestBody Review review) {
+        review.setUserId(AuthContext.userId());
         reviewService.save(review);
         return Result.success();
     }

@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.store.common.exception.BizException;
 import com.example.store.entity.Cart;
 import com.example.store.entity.CartItem;
+import com.example.store.entity.Product;
 import com.example.store.mapper.CartItemMapper;
 import com.example.store.mapper.CartMapper;
 import com.example.store.service.CartService;
+import com.example.store.service.ProductService;
 import com.example.store.vo.CartItemVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import java.util.List;
 public class CartServiceImpl extends ServiceImpl<CartItemMapper, CartItem> implements CartService {
 
     private final CartMapper cartMapper;
+    private final ProductService productService;
 
     private Long getOrCreateCart(Long userId) {
         Cart cart = cartMapper.selectOne(
@@ -38,14 +41,28 @@ public class CartServiceImpl extends ServiceImpl<CartItemMapper, CartItem> imple
 
     @Override
     public void addOrUpdate(Long userId, Long productId, Integer quantity) {
+        if (productId == null || quantity == null || quantity <= 0) {
+            throw new BizException(400, "商品和数量不能为空，且数量必须大于 0");
+        }
+        Product product = productService.getById(productId);
+        if (product == null) {
+            throw new BizException("商品不存在");
+        }
         Long cartId = getOrCreateCart(userId);
         CartItem existing = lambdaQuery()
                 .eq(CartItem::getCartId, cartId)
                 .eq(CartItem::getProductId, productId).one();
         if (existing != null) {
-            existing.setQuantity(existing.getQuantity() + quantity);
+            int nextQuantity = existing.getQuantity() + quantity;
+            if (nextQuantity > product.getStock()) {
+                throw new BizException("加入数量超过库存");
+            }
+            existing.setQuantity(nextQuantity);
             updateById(existing);
         } else {
+            if (quantity > product.getStock()) {
+                throw new BizException("加入数量超过库存");
+            }
             CartItem item = new CartItem();
             item.setCartId(cartId);
             item.setProductId(productId);

@@ -7,10 +7,21 @@ const request = axios.create({
   timeout: 10000
 })
 
+request.interceptors.request.use(config => {
+  const store = useUserStore()
+  if (store.token) {
+    config.headers.Authorization = `Bearer ${store.token}`
+  }
+  return config
+})
+
 request.interceptors.response.use(
   res => {
     const data = res.data
     if (data.code !== 200) {
+      if (data.code === 401) {
+        useUserStore().logout()
+      }
       ElMessage.error(data.message || '请求失败')
       return Promise.reject(data.message)
     }
