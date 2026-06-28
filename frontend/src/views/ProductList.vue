@@ -4,8 +4,8 @@
       <div class="cinematic-grid" />
       <div class="lux-container list-hero__inner">
         <p class="eyebrow reveal">精选目录</p>
-        <h1 class="display-title reveal reveal-delay-1">为旗舰设备打造的安静目录。</h1>
-        <p class="body-large reveal reveal-delay-2">用发布会式的大图浏览、精准筛选和克制排版，替代拥挤的传统货架。</p>
+        <h1 class="display-title reveal reveal-delay-1">为旗舰设备打造的安静目录</h1>
+        <p class="body-large reveal reveal-delay-2">用发布会式的大图浏览、精准筛选和克制排版，替代拥挤的传统货架</p>
       </div>
     </section>
 
@@ -46,8 +46,9 @@
       <div class="catalog__main">
         <div class="catalog__top">
           <p>{{ total }} 件高端设备</p>
-          <span>Apple Store 式布局</span>
+          <span>瀑布式布局</span>
         </div>
+<!--        产品列表-->
         <div v-if="sortedProducts.length" class="masonry">
           <ProductCard
             v-for="item in sortedProducts"
@@ -58,7 +59,9 @@
           />
         </div>
         <EmptyState v-else title="没有匹配产品" text="换一个关键词，或清空筛选条件后继续探索。" />
+<!--        产品列表换页逻辑-->
         <el-pagination
+          class="catalog-pagination"
           v-if="total > pageSize"
           v-model:current-page="pageNum"
           :page-size="pageSize"
@@ -183,6 +186,10 @@ onMounted(async () => {
 .catalog__main {
   display: grid;
   gap: 26px;
+}
+
+.catalog-pagination {
+  margin-top: 56px;
 }
 
 .catalog__top {
