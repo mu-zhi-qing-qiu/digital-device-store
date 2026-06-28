@@ -42,21 +42,23 @@
     </section>
 
     <section class="section hot">
-      <div class="lux-container hot__head">
-        <div>
-          <p class="eyebrow">热门设备</p>
-          <h2 class="section-title">热门商品，不做拥挤陈列。</h2>
+      <div class="hot__pin">
+        <div class="lux-container hot__head">
+          <div>
+            <p class="eyebrow">热门设备</p>
+            <h2 class="section-title">热门商品，不做拥挤陈列。</h2>
+          </div>
+          <LuxuryButton variant="ghost" to="/products">全部产品</LuxuryButton>
         </div>
-        <LuxuryButton variant="ghost" to="/products">全部产品</LuxuryButton>
-      </div>
-      <div class="hot__rail thin-scrollbar">
-        <ProductCard
-          v-for="item in products.slice(0, 8)"
-          :key="item.id"
-          :product="item"
-          :image="productImages[item.id]"
-          @quick-add="quickAdd"
-        />
+        <div class="hot__rail thin-scrollbar">
+          <ProductCard
+            v-for="item in products.slice(0, 8)"
+            :key="item.id"
+            :product="item"
+            :image="productImages[item.id]"
+            @quick-add="quickAdd"
+          />
+        </div>
       </div>
     </section>
 
@@ -106,7 +108,6 @@ const total = ref(0)
 const productImages = ref({})
 
 const heroProduct = computed(() => products.value[0])
-const heroImage = computed(() => (heroProduct.value ? productImages.value[heroProduct.value.id] : ''))
 const flagshipProducts = computed(() => products.value.slice(1, 4))
 
 const ideals = [
@@ -176,18 +177,6 @@ onMounted(async () => {
   margin-top: 34px;
 }
 
-.hero__orb {
-  display: grid;
-  width: min(44vw, 520px);
-  height: min(44vw, 520px);
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.22);
-  font-size: 96px;
-  font-weight: 900;
-}
-
 .hero__metrics {
   position: absolute;
   z-index: 3;
@@ -211,10 +200,6 @@ onMounted(async () => {
   grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
   align-items: center;
   gap: 56px;
-}
-
-.feature-row--reverse {
-  grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
 }
 
 .feature-row--reverse .feature-row__media {
@@ -258,25 +243,33 @@ onMounted(async () => {
 .hot {
   --hot-side: max(24px, calc((100vw - 1440px) / 2));
   position: relative;
-  min-height: 260vh;
+  min-height: 280vh;
   overflow: clip;
   view-timeline-name: --hot-scroll;
   view-timeline-axis: block;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.hot__pin {
+  position: sticky;
+  top: var(--nav-height);
+  display: grid;
+  min-height: calc(100vh - var(--nav-height));
+  align-content: center;
+  gap: 32px;
+  overflow: hidden;
+  padding: 72px 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.96), rgba(0, 0, 0, 0.82));
 }
 
 .hot__head {
-  position: sticky;
-  top: calc(var(--nav-height) + 28px);
   z-index: 2;
   display: flex;
   align-items: end;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 32px;
-  padding-top: 18px;
-  padding-bottom: 28px;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.62), transparent);
-  backdrop-filter: blur(12px);
+  margin-bottom: 0;
 }
 
 .hot__rail {
@@ -287,13 +280,11 @@ onMounted(async () => {
   gap: 22px;
   overflow: visible;
   padding: 0 var(--hot-side) 18px;
-  position: sticky;
-  top: calc(var(--nav-height) + 170px);
   scrollbar-width: none;
   will-change: transform;
   animation: hot-rail-pan linear both;
   animation-timeline: --hot-scroll;
-  animation-range: entry 52% exit 72%;
+  animation-range: contain 0% contain 100%;
 }
 
 .hot__rail::-webkit-scrollbar {
@@ -310,15 +301,17 @@ onMounted(async () => {
   }
 }
 
-@supports not (animation-timeline: view()) {
+@supports not ((view-timeline-name: --hot-scroll) and (animation-timeline: --hot-scroll)) {
   .hot {
     min-height: auto;
     overflow: hidden;
   }
 
-  .hot__head,
-  .hot__rail {
+  .hot__pin {
     position: static;
+    min-height: auto;
+    padding: 0;
+    background: transparent;
   }
 
   .hot__rail {
@@ -392,12 +385,6 @@ cite {
 }
 
 @media (max-width: 900px) {
-  .feature-row,
-  .feature-row--reverse,
-  .philosophy,
-  .quote-row {
-    grid-template-columns: 1fr;
-  }
 
   .feature-row--reverse .feature-row__media {
     order: 0;
@@ -419,9 +406,11 @@ cite {
     min-height: auto;
   }
 
-  .hot__head,
-  .hot__rail {
+  .hot__pin {
     position: static;
+    min-height: auto;
+    padding: 0;
+    background: transparent;
   }
 
   .hot__rail {
