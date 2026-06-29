@@ -3,8 +3,8 @@
     <div class="cinematic-grid" />
     <section class="lux-container not-found__inner">
       <p class="eyebrow">404</p>
-      <h1 class="display-title">这个页面还未发布。</h1>
-      <p class="body-large">回到产品体验主线，继续探索高端数码设备。</p>
+      <h1 class="display-title">这个页面还未发布</h1>
+      <p class="body-large">回到产品体验主线，继续探索高端数码设备</p>
       <LuxuryButton to="/">返回首页</LuxuryButton>
     </section>
   </main>

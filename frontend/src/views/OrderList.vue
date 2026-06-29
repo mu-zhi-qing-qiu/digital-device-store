@@ -2,7 +2,7 @@
   <main class="page orders-page">
     <section class="lux-container head">
       <p class="eyebrow">订单</p>
-      <h1 class="display-title">订单像时间线一样清晰。</h1>
+      <h1 class="display-title">订单像时间线一样清晰</h1>
     </section>
 
     <section class="lux-container content">

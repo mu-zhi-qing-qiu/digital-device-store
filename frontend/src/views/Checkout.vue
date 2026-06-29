@@ -3,8 +3,8 @@
     <section class="lux-container checkout">
       <div class="checkout__copy">
         <p class="eyebrow">结算</p>
-        <h1 class="display-title">确认订单。</h1>
-        <p class="body-large">以最少步骤完成购买，并保持高级产品体验的完整性。</p>
+        <h1 class="display-title">确认订单</h1>
+        <p class="body-large">以最少步骤完成购买，并保持高级产品体验的完整性</p>
       </div>
 
       <div class="checkout__layout">
