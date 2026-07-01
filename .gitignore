@@ -21,3 +21,10 @@ frontend/dist/
 
 ### docx ###
 *.docx
+
+### AI ###
+.claude
+.codex
+
+### m2 ###
+.m2/*
