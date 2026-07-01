@@ -10,11 +10,17 @@
         <result property="quantity"      column="quantity"/>
         <result property="purchasePrice" column="purchase_price"/>
         <result property="productName"   column="product_name"/>
+        <result property="productImage"  column="product_image"/>
     </resultMap>
 
     <select id="selectWithProductByOrderId" resultMap="OrderItemVOMap">
         SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.purchase_price,
-               p.name AS product_name
+               p.name AS product_name,
+               (SELECT pi.url
+                  FROM product_image pi
+                 WHERE pi.product_id = p.id
+                 ORDER BY pi.id
+                 LIMIT 1) AS product_image
         FROM order_item oi
         LEFT JOIN product p ON oi.product_id = p.id
         WHERE oi.order_id = #{orderId}

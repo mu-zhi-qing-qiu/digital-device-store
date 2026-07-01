@@ -14,4 +14,6 @@ public interface OrderService extends IService<Order> {
     Page<Order> pageAll(Integer pageNum, Integer pageSize);
     /** 查询订单明细（含商品名称） */
     List<OrderItemVO> getOrderItems(Long orderId);
+    /** 用户支付本人订单（待付款 -> 已付款） */
+    void payOrder(Long userId, Long orderId);
 }

@@ -46,7 +46,7 @@
         <div class="lux-container hot__head">
           <div>
             <p class="eyebrow">热门设备</p>
-            <h2 class="section-title">热门商品，不做拥挤陈列。</h2>
+            <h2 class="section-title">热门商品，快速预览</h2>
           </div>
           <LuxuryButton variant="ghost" to="/products">全部产品</LuxuryButton>
         </div>

@@ -107,6 +107,30 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         return orderItemMapper.selectWithProductByOrderId(orderId);
     }
 
+    @Override
+    @Transactional
+    public void payOrder(Long userId, Long orderId) {
+        Order order = getById(orderId);
+        if (order == null) {
+            throw new BizException("订单不存在");
+        }
+        if (!order.getUserId().equals(userId)) {
+            throw new BizException(403, "无权操作其他用户订单");
+        }
+        if (!Integer.valueOf(0).equals(order.getStatus())) {
+            throw new BizException("订单当前状态不可支付");
+        }
+        // 条件更新：仅当仍为「待付款」时置为「已付款」，避免重复支付
+        boolean paid = lambdaUpdate()
+                .eq(Order::getId, orderId)
+                .eq(Order::getStatus, 0)
+                .set(Order::getStatus, 1)
+                .update();
+        if (!paid) {
+            throw new BizException("订单当前状态不可支付");
+        }
+    }
+
     private void clearPurchasedCartItems(Long userId, List<Long> productIds) {
         Cart cart = cartMapper.selectOne(new LambdaQueryWrapper<Cart>()
                 .eq(Cart::getUserId, userId));

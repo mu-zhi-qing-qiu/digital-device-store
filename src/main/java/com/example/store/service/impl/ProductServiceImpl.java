@@ -15,8 +15,13 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     @Override
     public Page<Product> search(Integer pageNum, Integer pageSize, Long categoryId, String keyword) {
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<Product>()
-                .eq(categoryId != null, Product::getCategoryId, categoryId)
-                .like(StringUtils.hasText(keyword), Product::getName, keyword);
+                .eq(categoryId != null, Product::getCategoryId, categoryId);
+        if (StringUtils.hasText(keyword)) {
+            // 走 product.name 的 FULLTEXT(ngram) 索引；BOOLEAN 模式下用短语匹配，
+            // 行为接近原来的 LIKE '%关键词%' 子串检索。{0} 由 MyBatis-Plus 参数化，避免注入。
+            String phrase = "\"" + keyword.replace("\"", " ") + "\"";
+            wrapper.apply("MATCH(`name`) AGAINST({0} IN BOOLEAN MODE)", phrase);
+        }
         return page(new Page<>(pageNum, pageSize), wrapper);
     }
 }

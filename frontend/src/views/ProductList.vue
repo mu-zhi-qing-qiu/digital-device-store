@@ -9,7 +9,7 @@
       </div>
     </section>
 
-    <section class="lux-container catalog">
+    <section class="lux-container catalog" ref="catalogRef">
       <aside class="filters glass">
         <label>
           <span>搜索</span>
@@ -67,7 +67,7 @@
           :page-size="pageSize"
           :total="total"
           layout="prev, pager, next"
-          @current-change="fetchProducts"
+          @current-change="handlePageChange"
         />
       </div>
     </section>
@@ -96,7 +96,7 @@ const pageNum = ref(1)
 const pageSize = ref(12)
 const total = ref(0)
 const productImages = ref({})
-
+const catalogRef = ref(null)
 const brands = computed(() => [...new Set(products.value.map(item => item.brand).filter(Boolean))])
 const filteredProducts = computed(() => (
   selectedBrand.value ? products.value.filter(item => item.brand === selectedBrand.value) : products.value
@@ -108,6 +108,23 @@ const sortedProducts = computed(() => {
   return list
 })
 
+// 换页时拉取对应页数据，并平滑回到页面顶部
+async function handlePageChange() {
+  scrollToCatalog()
+  fetchProducts()
+}
+
+// 平滑滚动到产品列表
+const scrollToCatalog = () => {
+  if (catalogRef.value) {
+    catalogRef.value.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    })
+  }
+}
+
+// 拉取产品列表数据含图片
 async function fetchProducts() {
   const res = await getProducts({
     pageNum: pageNum.value,

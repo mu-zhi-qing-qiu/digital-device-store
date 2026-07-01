@@ -11,4 +11,5 @@ public class OrderItemVO {
     private Integer quantity;
     private BigDecimal purchasePrice;
     private String productName;
+    private String productImage;
 }

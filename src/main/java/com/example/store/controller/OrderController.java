@@ -56,6 +56,13 @@ public class OrderController {
         return Result.success(orderService.getOrderItems(orderId));
     }
 
+    /** 支付订单（用户支付本人订单：待付款 -> 已付款） */
+    @PostMapping("/{orderId}/pay")
+    public Result<Void> pay(@PathVariable Long orderId) {
+        orderService.payOrder(AuthContext.userId(), orderId);
+        return Result.success();
+    }
+
     /** 更新订单状态（管理端） */
     @PutMapping("/status")
     public Result<Void> updateStatus(@RequestBody Order order) {
