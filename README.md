@@ -112,7 +112,8 @@ DigitalDeviceStore/
 `sql/add_indexes.sql` 在建表基础上追加的索引（**必须手动执行**）：
 - `order(user_id, created_time)` 复合索引 + `order(created_time)` 索引（优化「我的订单」与后台订单分页排序，并删除冗余的 `idx_user_id`）
 - `product(name)` 的 **`FULLTEXT ... WITH PARSER ngram`** 全文索引（**商品搜索接口依赖此索引，未创建会导致搜索报错**）
-
+- 
+`sql/20260701114147.sql` 为数据库填充数据（**必须手动执行**） 否则前端首页、商品列表、搜索等功能会无数据。
 ---
 
 ## 环境需求
